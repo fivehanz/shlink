@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  shlink:
+    image: ghcr.io/shlinkio/shlink:stable
+    ports:
+      - "58282:8080"
+    networks:
+      - shlink-nw
+    container_name: shlink_prod_app
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DEFAULT_DOMAIN=${DEFAULT_DOMAIN}
+      - IS_HTTPS_ENABLED=${IS_HTTPS_ENABLED}
+      - GEOLITE_LICENSE_KEY=${GEOLITE_LICENSE_KEY}
+      - SKIP_INITIAL_GEOLITE_DOWNLOAD=true
+      - DB_DRIVER=postgres
+      - DB_USER=user
+      - DB_PASSWORD=dbpassword
+      - DB_HOST=db
+      - REDIS_SERVERS=redis://redis:6379
+
+  db:
+    image: postgres:15-alpine
+    container_name: shlink_prod_postgres_db
+    restart: unless-stopped
+    networks:
+      - shlink-nw
+      - db
+    # volumes:
+      # - /opt/databases/prod/shlink/postgresql/db:/var/lib/postgresql/db
+    environment:
+      - POSTGRES_DB=shlink
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=dbpassword
+      - PGDATA=/var/lib/postgresql/db
+
+  redis:
+    image: redis:7-bookworm
+    container_name: shlink_prod_app_redis
+    restart: unless-stopped
+    networks:
+      - shlink-nw
+
+networks:
+  shlink-nw:
+  db:
