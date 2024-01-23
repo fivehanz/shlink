@@ -30,8 +30,8 @@ services:
     networks:
       - shlink-nw
       - db
-    # volumes:
-      # - /opt/databases/prod/shlink/postgresql/db:/var/lib/postgresql/db
+    volumes:
+      - /opt/databases/prod/shlink/postgresql/db:/var/lib/postgresql/db
     environment:
       - POSTGRES_DB=shlink
       - POSTGRES_USER=user
